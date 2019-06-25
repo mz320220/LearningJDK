@@ -35,10 +35,12 @@ import java.util.Objects;
  * is written to it.
  * The data can be retrieved using {@code toByteArray()} and
  * {@code toString()}.
+ * ByteArrayOutputStream实现了一个output stream，其中的数据以byte字节数组形式写出。缓存会随着数据不断写入自增长.
  * <p>
  * Closing a {@code ByteArrayOutputStream} has no effect. The methods in
  * this class can be called after the stream has been closed without
  * generating an {@code IOException}.
+ * 关闭ByteArrayOutputStream没有影响，其中的方法可以在流被关闭后被调用而不会抛出任何IO异常
  *
  * @author  Arthur van Hoff
  * @since   1.0
@@ -48,17 +50,20 @@ public class ByteArrayOutputStream extends OutputStream {
 
     /**
      * The buffer where data is stored.
+     * 保存“字节数组输出流”数据的数组
      */
     protected byte buf[];
 
     /**
      * The number of valid bytes in the buffer.
+     * 缓冲区中的有效字节数
      */
     protected int count;
 
     /**
      * Creates a new {@code ByteArrayOutputStream}. The buffer capacity is
      * initially 32 bytes, though its size increases if necessary.
+     * 构造函数：默认创建的字节数组初始大小是32，在必要时会增长
      */
     public ByteArrayOutputStream() {
         this(32);
@@ -67,6 +72,7 @@ public class ByteArrayOutputStream extends OutputStream {
     /**
      * Creates a new {@code ByteArrayOutputStream}, with a buffer capacity of
      * the specified size, in bytes.
+     * 构造指定大小的输出流
      *
      * @param  size   the initial size.
      * @throws IllegalArgumentException if size is negative.
@@ -83,6 +89,7 @@ public class ByteArrayOutputStream extends OutputStream {
      * Increases the capacity if necessary to ensure that it can hold
      * at least the number of elements specified by the minimum
      * capacity argument.
+     * 保证容量可以容纳指定大小minCapcacity，若“实际容量 < minCapacity”，则增加“字节数组输出流”的容量
      *
      * @param  minCapacity the desired minimum capacity
      * @throws OutOfMemoryError if {@code minCapacity < 0}.  This is
@@ -100,24 +107,29 @@ public class ByteArrayOutputStream extends OutputStream {
      * Some VMs reserve some header words in an array.
      * Attempts to allocate larger arrays may result in
      * OutOfMemoryError: Requested array size exceeds VM limit
+     * 可分配的最大数组大小，
+     * 有些虚拟机在数组中保留一些头信息。
+     * 尝试分配更大的数组可能会导致
+     * OutOfMemoryError:请求的数组大小超过VM限制(所以-8)
      */
     private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 
     /**
      * Increases the capacity to ensure that it can hold at least the
      * number of elements specified by the minimum capacity argument.
-     *
+     * 扩容：以保证可以持有minCapacity指定的最小容量
      * @param minCapacity the desired minimum capacity
      */
     private void grow(int minCapacity) {
         // overflow-conscious code
-        int oldCapacity = buf.length;
-        int newCapacity = oldCapacity << 1;
-        if (newCapacity - minCapacity < 0)
+        int oldCapacity = buf.length;       //原大小为缓冲区数组大小
+        int newCapacity = oldCapacity << 1; //新的容量在原基础上扩大一倍
+        if (newCapacity - minCapacity < 0)  //如果扩大后仍然小于指定的minCapacity，则以minCapacity作为新的容量大小
             newCapacity = minCapacity;
-        if (newCapacity - MAX_ARRAY_SIZE > 0)
+        if (newCapacity - MAX_ARRAY_SIZE > 0)   //如果扩容后或指定的新的容量大小newCapacity已经大于最大允许缓冲区大小
+                                                // 则指定大小为MAX_ARRAY_SIZE或MAX_VALUE
             newCapacity = hugeCapacity(minCapacity);
-        buf = Arrays.copyOf(buf, newCapacity);
+        buf = Arrays.copyOf(buf, newCapacity);  //复制原缓冲区的数组到newCapacity大小的数组中
     }
 
     private static int hugeCapacity(int minCapacity) {
@@ -130,18 +142,20 @@ public class ByteArrayOutputStream extends OutputStream {
 
     /**
      * Writes the specified byte to this {@code ByteArrayOutputStream}.
+     * 写入一个字节b到“字节数组输出流”中，并将计数+1
      *
      * @param   b   the byte to be written.
      */
     public synchronized void write(int b) {
-        ensureCapacity(count + 1);
-        buf[count] = (byte) b;
-        count += 1;
+        ensureCapacity(count + 1); //确保缓冲区在现有基础上可以写入一个byte(否则会进行扩容)
+        buf[count] = (byte) b; //缓冲区buf的第count个字节写入b
+        count += 1; //计数+1
     }
 
     /**
      * Writes {@code len} bytes from the specified byte array
      * starting at offset {@code off} to this {@code ByteArrayOutputStream}.
+     * 写入输出流，从数组b的off位置写入len个
      *
      * @param   b     the data.
      * @param   off   the start offset in the data.
@@ -152,8 +166,10 @@ public class ByteArrayOutputStream extends OutputStream {
      * {@code b.length - off}
      */
     public synchronized void write(byte b[], int off, int len) {
+        //校验，需要满足：off + len <= b.length
         Objects.checkFromIndexSize(off, len, b.length);
         ensureCapacity(count + len);
+        //数组复制：从b的off处复制len个到buf的count处
         System.arraycopy(b, off, buf, count, len);
         count += len;
     }
@@ -164,6 +180,7 @@ public class ByteArrayOutputStream extends OutputStream {
      *
      * @apiNote
      * This method is equivalent to {@link #write(byte[],int,int)
+     * 等效于：
      * write(b, 0, b.length)}.
      *
      * @param   b     the data.
@@ -178,6 +195,7 @@ public class ByteArrayOutputStream extends OutputStream {
      * Writes the complete contents of this {@code ByteArrayOutputStream} to
      * the specified output stream argument, as if by calling the output
      * stream's write method using {@code out.write(buf, 0, count)}.
+     * 将ByteArrayOutputStream的完整内容写入到输出流OutputStream中
      *
      * @param   out   the output stream to which to write the data.
      * @throws  NullPointerException if {@code out} is {@code null}.
@@ -192,6 +210,7 @@ public class ByteArrayOutputStream extends OutputStream {
      * to zero, so that all currently accumulated output in the
      * output stream is discarded. The output stream can be used again,
      * reusing the already allocated buffer space.
+     * 重置“字节数组输出流”的计数。所有输出流中的内容都会被舍弃，output stream可以被重新使用，重用已分配的缓冲区空间
      *
      * @see     java.io.ByteArrayInputStream#count
      */
@@ -203,6 +222,7 @@ public class ByteArrayOutputStream extends OutputStream {
      * Creates a newly allocated byte array. Its size is the current
      * size of this output stream and the valid contents of the buffer
      * have been copied into it.
+     * 将字节输出流中的内容写入到一个新的字节数组中
      *
      * @return  the current contents of this output stream, as a byte array.
      * @see     java.io.ByteArrayOutputStream#size()
@@ -213,6 +233,7 @@ public class ByteArrayOutputStream extends OutputStream {
 
     /**
      * Returns the current size of the buffer.
+     * 返回缓冲区当前大小
      *
      * @return  the value of the {@code count} field, which is the number
      *          of valid bytes in this output stream.
@@ -227,6 +248,7 @@ public class ByteArrayOutputStream extends OutputStream {
      * platform's default character set. The length of the new {@code String}
      * is a function of the character set, and hence may not be equal to the
      * size of the buffer.
+     * 以平台默认格式输出到字符串中
      *
      * <p> This method always replaces malformed-input and unmappable-character
      * sequences with the default replacement string for the platform's
@@ -244,6 +266,7 @@ public class ByteArrayOutputStream extends OutputStream {
     /**
      * Converts the buffer's contents into a string by decoding the bytes using
      * the named {@link java.nio.charset.Charset charset}.
+     * 指定格式输出到字符串中
      *
      * <p> This method is equivalent to {@code #toString(charset)} that takes a
      * {@link java.nio.charset.Charset charset}.
@@ -330,6 +353,8 @@ public class ByteArrayOutputStream extends OutputStream {
      * Closing a {@code ByteArrayOutputStream} has no effect. The methods in
      * this class can be called after the stream has been closed without
      * generating an {@code IOException}.
+     *
+     * close()方法在该类中无影响，流关闭后调用也不会抛出IO异常
      */
     public void close() throws IOException {
     }

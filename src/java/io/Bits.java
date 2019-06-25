@@ -25,10 +25,21 @@
 
 package java.io;
 
-/**
+/**EM DONE
  * Utility methods for packing/unpacking primitive values in/out of byte arrays
  * using big-endian byte ordering.
+ * ——封装、解封原始值进、出字节数组的高效方法，通过big-endian字节序。
+ * big-endian-大端字节序：
+ * ——高位字节在前，低位字节在后。（这是人类读写数值的方法一致）
+ * ——数据的高位存储在低地址处，低位存储在高地址处。
+ * 举例：一个char型数据16个字节，低地址1-7bit为高位，高地址8-15bit为低位；
+ * https://blog.csdn.net/qq_35211818/article/details/80855683
  */
+/**
+ * 1、Bits为Default类型，非public类型，只可以被java.io包下的类引用。
+ * 2、方法均为static类型，通过类名进行访问
+ */
+
 class Bits {
 
     /*
@@ -40,6 +51,12 @@ class Bits {
         return b[off] != 0;
     }
 
+    /**
+     * char为两个字节，读取两个Byte共16Bits，由于是大端字节序：
+     * b[off]数据的高8位 --> 左位移8位到最终位置。
+     * b[off+1]数据的低8位
+     * & 0xFF -> 消除java二元运算中自动升级为int时以符号位补全的影响，只保留需要的8bits
+     */
     static char getChar(byte[] b, int off) {
         return (char) ((b[off + 1] & 0xFF) +
                        (b[off] << 8));

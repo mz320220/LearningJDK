@@ -538,7 +538,7 @@ public abstract class InputStream implements Closeable {
         return n - remaining;
     }
 
-    /**
+    /**EM DONE
      * Returns an estimate of the number of bytes that can be read (or skipped
      * over) from this input stream without blocking, which may be 0, or 0 when
      * end of stream is detected.  The read might be on the same thread or
@@ -549,6 +549,7 @@ public abstract class InputStream implements Closeable {
      * return the total number of bytes in the stream, many will not.  It is
      * never correct to use the return value of this method to allocate
      * a buffer intended to hold all data in this stream.
+     * 有些实现类会返回stream中所有的字节数，有些不会。例如FilterInputStream
      *
      * <p> A subclass's implementation of this method may choose to throw an
      * {@link IOException} if this input stream has been closed by invoking the
@@ -556,6 +557,7 @@ public abstract class InputStream implements Closeable {
      *
      * <p> The {@code available} method of {@code InputStream} always returns
      * {@code 0}.
+     *  InputStream.available()始终返回0
      *
      * <p> This method should be overridden by subclasses.
      *

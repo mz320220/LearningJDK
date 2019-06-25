@@ -46,17 +46,20 @@ public
 class FilterInputStream extends InputStream {
     /**
      * The input stream to be filtered.
+     * 需要过滤的输入流
      */
     protected volatile InputStream in;
 
-    /**
+    /**EM DONE
      * Creates a <code>FilterInputStream</code>
      * by assigning the  argument <code>in</code>
      * to the field <code>this.in</code> so as
      * to remember it for later use.
+     * 构造FilterInputStream ： in，供后续使用
      *
      * @param   in   the underlying input stream, or <code>null</code> if
      *          this instance is to be created without an underlying stream.
+     *               in会为null如果实例不从一个基础流上创建
      */
     protected FilterInputStream(InputStream in) {
         this.in = in;
@@ -150,7 +153,7 @@ class FilterInputStream extends InputStream {
         return in.skip(n);
     }
 
-    /**
+    /**EM DONE
      * Returns an estimate of the number of bytes that can be read (or
      * skipped over) from this input stream without blocking by the next
      * caller of a method for this input stream. The next caller might be
@@ -158,6 +161,7 @@ class FilterInputStream extends InputStream {
      * many bytes will not block, but may read or skip fewer bytes.
      * <p>
      * This method returns the result of {@link #in in}.available().
+     * 这个方法如果不抛出IOException，则始终返回0
      *
      * @return     an estimate of the number of bytes that can be read (or skipped
      *             over) from this input stream without blocking.

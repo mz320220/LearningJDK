@@ -163,25 +163,29 @@ public final class Unsafe {
     }
     
     
-    /**
+    /**EM DONE
      * Provides the caller with the capability of performing unsafe
      * operations.
+     * 为调用者提供执行不安全操作的能力。——可以直接操作任意内存地址
      *
      * <p>The returned {@code Unsafe} object should be carefully guarded
      * by the caller, since it can be used to read and write data at arbitrary
      * memory addresses.  It must never be passed to untrusted code.
+     * 需要仔细使用该方法返回的unsafe ->可以直接操作任意内存地址 -> 绝对禁止传递给不受信的代码
      *
      * <p>Most methods in this class are very low-level, and correspond to a
      * small number of hardware instructions (on typical machines).  Compilers
      * are encouraged to optimize these methods accordingly.
+     *  Unsafe类中多数方法都很“底层”，相当于一些小的硬件指令（在特定机器上） -> 编译器一般被鼓励做相应的优化
      *
      * <p>Here is a suggested idiom for using unsafe operations:
-     *
+     *  以下为unsafe的一例惯用法：
      * <pre> {@code
      * class MyTrustedClass {
      *   private static final Unsafe unsafe = Unsafe.getUnsafe();
      *   ...
      *   private long myCountAddress = ...;
+     *   ——直接获取内存地址
      *   public int getCount() { return unsafe.getByte(myCountAddress); }
      * }}</pre>
      *
@@ -285,7 +289,7 @@ public final class Unsafe {
         return objectFieldOffset0(f);
     }
     
-    /**
+    /**EM DONE
      * Reports the location of the field with a given name in the storage allocation of its class.
      *
      * @throws NullPointerException if any parameter is {@code null}.
@@ -293,6 +297,7 @@ public final class Unsafe {
      *                              in class {@code c}, i.e., if {@code c.getDeclaredField(name)}
      *                              would throw {@code java.lang.NoSuchFieldException}.
      * @see #objectFieldOffset(Field)
+     * 获取给定名称的字段在其类的存储分配中的位置。
      */
     // 获取非静态字段name在其类中的JVM偏移地址
     public long objectFieldOffset(Class<?> c, String name) {
